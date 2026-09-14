@@ -21,11 +21,11 @@ countZero [] = 0
 countZero (B0:xs) = 1 + countZero xs
 countZero (B1:xs) = countZero xs
 
-majority :: [Bit] -> Bit
-majority [] = B1
+majority :: [Bit] -> Maybe Bit
+majority [] = Nothing
 majority xs 
     |countZero xs > countOne xs = B0
-    |otherwise = B1 -- tie/\empty == bit 1
+    |otherwise = Nothing
 
 findRedundancy :: Integer -> Integer -> Integer
 findRedundancy m p
