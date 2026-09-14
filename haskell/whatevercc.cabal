@@ -1,0 +1,12 @@
+cabal-version:      2.4
+name:               whatevercc
+version:            0.1.0.0
+synopsis:           An error-correcting-code project
+build-type:         Simple
+
+executable whatevercc
+    main-is:          Main.hs
+    hs-source-dirs:    app
+    build-depends:    base >=4.14 && <5
+    default-language: Haskell2010
+    ghc-options:      -Wall

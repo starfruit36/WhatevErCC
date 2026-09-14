@@ -1,0 +1,30 @@
+# Haskell
+dist/
+dist-newstyle/
+.ghc.environment.*
+cabal.project.local
+cabal.project.local~
+.stack-work/
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local configuration and editor files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
