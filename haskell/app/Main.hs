@@ -5,7 +5,7 @@ main = pure ()
 
 {-Implicitly assume everything here has no malformed input. explicit check is done at i/o.
 TODO: i/o + seperate module later + maybe test file + defense check when i feel like
-SECDEC-}
+SECDED-}
 
 
 -- Bit / GF(2) operations

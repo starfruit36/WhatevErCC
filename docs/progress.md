@@ -28,4 +28,5 @@ Reference `notes.md` for actual notes.
 
 ## Implementation Progress
 
-- Finishing **Hamming code**
+- Finished **Hamming code** for SEC
+- Implement **Hamming code** for SECDED
