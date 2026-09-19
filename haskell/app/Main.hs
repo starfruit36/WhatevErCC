@@ -13,10 +13,8 @@ SECDED-}
 data Bit = B0|B1
     deriving (Eq, Show)
 
-xor :: Bit -> Bit -> Bit
-xor a b
-    |a == b = B0
-    |otherwise = B1
+type Vector = [Bit]
+type Matrix = [[Bit]]
 
 notBit :: Bit -> Bit
 notBit B0 = B1
@@ -27,6 +25,9 @@ addBit B0 x  = x
 addBit B1 B0 = B1
 addBit B1 B1 = B0
 
+xor :: Bit -> Bit -> Bit
+xor = addBit
+
 mulBit :: Bit -> Bit -> Bit
 mulBit B1 B1 = B1
 mulBit _  _  = B0
@@ -34,19 +35,20 @@ mulBit _  _  = B0
 
 -- Bit-vector operations
 
-parity :: [Bit] -> Bit
+parity :: Vector -> Bit
+parity [] = []
 parity [x] = x
-parity (x:y:xs) = parity (addBit x y : xs)
+parity (x:xs) = addBit x (parity xs)
 
-dot :: [Bit] -> [Bit] -> Bit
+dot :: Vector -> Vector -> Bit
 dot xs ys = parity([mulBit x y| (x,y) <- zip xs ys])
 
-countOne :: [Bit] -> Integer -- find weight as well
+countOne :: Vector -> Int -- find weight as well
 countOne [] = 0
 countOne (B1:xs) = 1 + countOne xs
 countOne (B0:xs) = countOne xs
 
-countZero :: [Bit] -> Integer
+countZero :: Vector -> Int
 countZero [] = 0
 countZero (B0:xs) = 1 + countZero xs
 countZero (B1:xs) = countZero xs
@@ -54,66 +56,66 @@ countZero (B1:xs) = countZero xs
 
 -- Matrix helpers
 
-getCol :: [[Bit]] -> Int -> [Bit]
+getCol :: Matrix -> Int -> Vector
 getCol xs a = [row !! a | row <- xs]
 
-fillZero :: Integer -> [Bit]
-fillZero 0 = []
-fillZero x = [B0] ++ fillZero (x -1)
+fillZero :: Int -> Vector
+fillZero x = replicate x B0
 
-makeBasisVec :: Integer -> Integer -> [Bit] -- x is dimension, y is position
-makeBasisVec x y = fillZero y ++ [B1] ++ fillZero (x-y-1)
+makeBasisVec :: Int -> Int -> Vector -- x is dimension, y is position
+makeBasisVec x y = fillZero y ++ (B1 : fillZero (x-y-1))
 
-makeId :: Integer -> [[Bit]] -- dim
+makeId :: Int -> Matrix -- dim
 makeId x = [makeBasisVec x y| y <- [0 .. x-1]]
 
 
 -- Matrix operations
 
-matTrans :: [[Bit]] -> [[Bit]]
-matTrans xs = [getCol xs a| a <- [0 .. length (head xs) - 1]]
+matTrans :: Matrix -> Matrix
+matTrans [] = []
+matTrans ([]:_) = []
+matTrans xs = [head x | x <- xs] : matTrans [tail x | x <- xs]
 
-vecMat :: [Bit]   -> [[Bit]] -> [Bit] -- implicit row
+vecMat :: Vector -> Matrix -> Vector -- implicit row
 vecMat xs ys =
-    [dot xs (getCol ys a) | a <- [0 .. length (head ys) - 1]]
+    [dot xs y | y <- matTrans ys]
 
-matVec :: [[Bit]] -> [Bit]   -> [Bit] -- implicit col
+matVec :: Matrix -> Vector -> Vector -- implicit col
 matVec xs ys =
     [dot x ys|x <- xs]
 
-matMul :: [[Bit]] -> [[Bit]] -> [[Bit]]
+matMul :: Matrix -> Matrix -> Matrix
 matMul xs ys =
-    [[dot x (getCol ys a)| a <- [0 .. length (head ys) - 1]]
-    |x<-xs]
+    [[dot x y | y <- ysT] | x <- xs]
+    where
+        ysT = matTrans ys
 
-matAug :: [[Bit]] -> [[Bit]] -> [[Bit]]
-matAug xs ys = [x ++ y| (x,y) <- zip xs ys]
-
+matAug :: Matrix -> Matrix -> Matrix
+matAug xs ys = zipWith (++) xs ys
 
 -- Binary / integer helpers
 
-toInt :: [Bit] -> Integer
+toInt :: Vector -> Int
 toInt [] = 0
 toInt (B1:xs) = 1 + 2 * toInt xs
 toInt (B0:xs) = 2 * toInt xs
 
-toBin :: Integer -> [Bit]
+toBin :: Int -> Vector
 toBin x
     | x == 0 = [B0]
     | x == 1 = [B1]
-    | x `mod` 2 == 1  = [B1] ++ toBin (x `div` 2)
-    | otherwise = [B0] ++ toBin (x `div` 2)
+    | x `mod` 2 == 1  = B1 : toBin (x `div` 2)
+    | otherwise = B0 : toBin (x `div` 2)
 
-extendBin :: Integer -> [Bit] -> [Bit]
-extendBin 0 xs = xs
-extendBin x xs = extendBin (x-1) xs ++ [B0]
+extendBin :: Int -> Vector -> Vector
+extendBin x xs = xs ++ fillZero x
 
-toLen :: Integer -> Integer -- should have call floor log but idc
+toLen :: Int -> Int -- should have call floor log but idc
 toLen 0 = 1
 toLen 1 = 1
 toLen x = 1 + toLen (x `div` 2)
 
-isPow2 :: Integer -> Bool
+isPow2 :: Int -> Bool
 isPow2 1 = True
 isPow2 x
     | x <= 0        = False
@@ -123,20 +125,20 @@ isPow2 x
 
 -- Hamming code construction
 
-findRedundancy :: Integer -> Integer -> Integer -- 2^r >= n + 1, n = m + p
+findRedundancy :: Int -> Int -> Int -- 2^r >= n + 1, n = m + p
 findRedundancy m p
     |2^p >= m + p + 1 = p
     |otherwise = findRedundancy m (p+1)
 
-makeHam :: Integer -> [[Bit]] -- n = num of received bit (or transmit?) eitherway
+makeHam :: Int -> Matrix -- n = num of received bit (or transmit?) eitherway
 makeHam n =
     matTrans
         [   let x = toBin a
-            in extendBin (toLen n - fromIntegral (length x)) x
+            in extendBin (toLen n - length x) x
             |a <- [1 .. n]
         ]
 
-makeGenRow :: Integer -> Integer -> [Bit] -- n = yeah, c = col
+makeGenRow :: Int -> Int -> Vector -- n = yeah, c = col
 
 makeGenRow n c =
     [fill p | p <- [1 .. n]]
@@ -145,20 +147,18 @@ makeGenRow n c =
 
         fill p
             | p == c    = B1
-            | isPow2 p  = ps !! fromIntegral (toLen p - 1)
+            | isPow2 p  = ps !! (toLen p - 1)
             | otherwise = B0
 
-makeGen :: Integer -> [[Bit]] -- n = yeah
+makeGen :: Int -> Matrix -- n = yeah
 makeGen n =
     [makeGenRow n d | d <- [1 .. n], not (isPow2 d)]
 
 
 -- Error correction
 
-fixMistake :: Int -> [Bit] -> [Bit] -- int = index
+fixMistake :: Int -> Vector -> Vector -- int = index
 fixMistake 0 x = x
-fixMistake a x = i ++ [notBit j] ++ k
+fixMistake a x = i ++ (notBit j : k)
     where
-        i = fst (splitAt (a-1) x)
-        j = x !! (a-1)
-        k = snd (splitAt a x)
+        (i, j:k) = splitAt (a - 1) x
