@@ -36,7 +36,7 @@ mulBit _  _  = B0
 -- Bit-vector operations
 
 parity :: Vector -> Bit
-parity [] = []
+parity [] = B0
 parity [x] = x
 parity (x:xs) = addBit x (parity xs)
 
@@ -154,6 +154,9 @@ makeGen :: Int -> Matrix -- n = yeah
 makeGen n =
     [makeGenRow n d | d <- [1 .. n], not (isPow2 d)]
 
+cutVec :: Vector -> Vector
+cutVec [] = []
+cutVec xs = init xs
 
 -- Error correction
 
@@ -162,3 +165,26 @@ fixMistake 0 x = x
 fixMistake a x = i ++ (notBit j : k)
     where
         (i, j:k) = splitAt (a - 1) x
+
+makeCode :: Int -> Vector -> Vector
+makeCode x xs = c ++ [parity c]
+    where  
+        c = vecMat xs (makeGen (x+r))
+        r = findRedundancy x 0
+
+doubleDet :: Int -> Vector -> Vector -- int = message len
+doubleDet x xs 
+    |syndrome == zero && pari == B0 = xs
+    |syndrome /= zero && pari == B1 = fixMistake pos xs
+    |syndrome == zero && pari == B1 = fixMistake (length xs) xs
+    |syndrome /= zero && pari == B0 = xs --double error
+    where
+        code = cutVec xs
+        r = findRedundancy x 0
+        n = x + r
+        zero = fillZero (toLen n)
+        syndrome = matVec (makeHam n) code
+        pari = parity xs
+        pos = toInt syndrome
+
+--make post process (fst splitAt)

@@ -7,6 +7,8 @@
 - **2.4 — Cyclic Groups and the Order of an Element**
 - **2.5 — Homomorphisms and Isomorphisms**
 - **2.6 — Cosets and Lagrange's Theorem**
+- **2.8 — Normal Subgroups**
+- **2.9 — Factor Groups**
 
 ## Error-Correcting Codes
 
@@ -29,4 +31,4 @@ Reference `notes.md` for actual notes.
 ## Implementation Progress
 
 - Finished **Hamming code** for SEC
-- Implement **Hamming code** for SECDED
+- Finished **Hamming code** for SECDED

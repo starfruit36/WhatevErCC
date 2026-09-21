@@ -418,3 +418,12 @@ He=s=h_{i_1}+\cdots+h_{i_t}.
 $$
 
 If syndrome $s$ is unique to error pattern then solvable.
+
+### SECDED
+
+Add 1 parity at the end of the codeword to have even parity. Also increase min HD to 4. Just let par p = par c.
+Derive 4 cases:
+Syndrome give 0 and parity check give 0 = bing chilling
+Syndrome give not 0 and parity give 1 = 1 bit fliped, and hamming do its work
+Syndrome give 0 par check give 1 = bing chilling, error in parity bit
+Syndrome not 0 and parity check give 0 = 2 error, cooked
