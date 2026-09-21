@@ -17,5 +17,5 @@ cabal run
 
 - `haskell/whatevercc.cabal`: package and executable configuration.
 - `haskell/cabal.project`: selects the local package.
-- `haskell/app/Main.hs`: empty executable entry point.
+- `haskell/app/Main.hs`: 1 giant monolith, split later.
 - `.gitignore`: excludes Haskell and Python build output and local environments.
