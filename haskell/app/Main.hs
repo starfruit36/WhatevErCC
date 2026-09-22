@@ -125,7 +125,7 @@ isPow2 x
 
 -- Hamming code construction
 
-findRedundancy :: Int -> Int -> Int -- 2^r >= n + 1, n = m + p
+findRedundancy :: Int -> Int -> Int -- 2^p >= n + 1, n = m + p
 findRedundancy m p
     |2^p >= m + p + 1 = p
     |otherwise = findRedundancy m (p+1)
@@ -172,12 +172,12 @@ makeCode x xs = c ++ [parity c]
         c = vecMat xs (makeGen (x+r))
         r = findRedundancy x 0
 
-doubleDet :: Int -> Vector -> Vector -- int = message len
+doubleDet :: Int -> Vector -> (Vector, Bool) -- int = message len
 doubleDet x xs 
-    |syndrome == zero && pari == B0 = xs
-    |syndrome /= zero && pari == B1 = fixMistake pos xs
-    |syndrome == zero && pari == B1 = fixMistake (length xs) xs
-    |syndrome /= zero && pari == B0 = xs --double error
+    |syndrome == zero && pari == B0 = (xs, True)
+    |syndrome /= zero && pari == B1 = (fixMistake pos xs, True)
+    |syndrome == zero && pari == B1 = (fixMistake (length xs) xs, True)
+    |syndrome /= zero && pari == B0 = (xs, False) --double error
     where
         code = cutVec xs
         r = findRedundancy x 0
@@ -187,4 +187,11 @@ doubleDet x xs
         pari = parity xs
         pos = toInt syndrome
 
---make post process (fst splitAt)
+findLen :: Int -> Int -> Int
+findLen n p =
+    |2^p >= n + 1 = (n - p)
+    |otherwise findLen n p+1 
+
+postProcess :: Int -> Vector -> Vector -- int = message len, not recieved len, aka k instead of n
+postProcess _ [] = []
+postProcess x xs = fst (splitAt x xs)
