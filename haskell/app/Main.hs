@@ -195,3 +195,10 @@ findLen n p =
 postProcess :: Int -> Vector -> Vector -- int = message len, not recieved len, aka k instead of n
 postProcess _ [] = []
 postProcess x xs = fst (splitAt x xs)
+
+{-
+TODO: Write I/O -> Vector for read operation, maybe read vector in a file, or a list of vectors, we will assume a jagged matrix
+of col vector if multiple are represented, each are unique message
+    Return vector -> I/O vector using post process (or string? write a file? idk, maybe the point is not return, we'll see)
+    split the damn thing up and update cabal + stuff
+-}
