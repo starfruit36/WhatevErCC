@@ -70,7 +70,7 @@ doubleDet x xs
 findLen :: Int -> Int -> Int
 findLen n p 
     |2^p >= n + 1 = (n - p)
-    |otherwise = findLen n p+1
+    |otherwise = findLen n (p+1)
 
 postProcess :: Int -> Vector -> Vector -- int = message len, not recieved len, aka k instead of n
 postProcess _ [] = []

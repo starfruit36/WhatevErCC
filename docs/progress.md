@@ -9,6 +9,8 @@
 - **2.6 — Cosets and Lagrange's Theorem**
 - **2.8 — Normal Subgroups**
 - **2.9 — Factor Groups**
+- **2.10 — The Isomorphism Theorem**
+- **2.11 — An Application to BLC**
 
 ## Error-Correcting Codes
 

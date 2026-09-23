@@ -422,8 +422,29 @@ If syndrome $s$ is unique to error pattern then solvable.
 ### SECDED
 
 Add 1 parity at the end of the codeword to have even parity. Also increase min HD to 4. Just let par p = par c.
+
 Derive 4 cases:
+
 Syndrome give 0 and parity check give 0 = bing chilling
+
 Syndrome give not 0 and parity give 1 = 1 bit fliped, and hamming do its work
+
 Syndrome give 0 par check give 1 = bing chilling, error in parity bit
+
 Syndrome not 0 and parity check give 0 = 2 error, cooked
+
+## Minor algebra link
+
+Triangle ineq proof (w(x+y)<= wx + wy, x+y = 1 <=> x\/y = 1)
+
+n,k code = subgroup order k, bit len n, order 2^k as per lagrange theorem (note additive group)
+
+some funky pariwise proof for correcting bound (prlly for unabiguous mapping define, combinatoric work better tbh)
+
+there are 2^n/2^k = 2^n-k coset (w + C) where w in {0,1}^n.
+
+Let C = (n,k) code. e = coset leader (min weight) from w + C, then decode w as w-e
+
+Let d in w + C, c = w - e, d(w,c) = d(w, w-e) = e <= w(w,d) (by choice) = d(w,d). Coset decode = parity decode.
+
+aka, very much just a different view, not at all interesting.
